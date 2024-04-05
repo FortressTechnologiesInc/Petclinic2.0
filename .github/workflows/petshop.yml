@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
@@ -85,15 +85,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: main
 
-      - name: Send email notification
-        env:
-          BUILD_RESULT: ${{ job.status }}
-          JOB_NAME: ${{ github.workflow }}
-          BUILD_NUMBER: ${{ github.run_number }}
-          BUILD_URL: ${{ github.run_url }}
-        run: |
-          echo "Project: $JOB_NAME"
-          echo "Build Number: $BUILD_NUMBER"
-          echo "URL: $BUILD_URL"
-          echo "Result: $BUILD_RESULT"
-          # Add email sending logic here
+      
