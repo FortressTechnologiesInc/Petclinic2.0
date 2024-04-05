@@ -69,12 +69,12 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           docker build -t petshop .
-          docker tag petshop sevenajay/petshop:latest
+          docker tag petshop limkel/petshop:3.0
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-          docker push sevenajay/petshop:latest
+          docker push limkel/petshop:3.0
 
       - name: Run TRIVY
-        run: trivy image sevenajay/petshop:latest > trivy.txt
+        run: trivy image limkel/petshop:3.0 > trivy.txt
 
       - name: Trigger deployment
         uses: octokit/request-action@v2.x
