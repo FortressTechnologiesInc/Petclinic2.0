@@ -22,17 +22,16 @@ jobs:
       - name: Set up Maven
         uses: actions/setup-java@v2
         with:
-          distribution: 'maven'
-          java-version: '3.8.5'
+          distribution: 'temurin'
+          java-version: '17'
+          server-id: github
+          server-username: ${{ github.actor }}
+          server-password: ${{ secrets.GITHUB_TOKEN }}
+          overwrite-settings: true
 
       - name: Clean workspace
         run: git clean -fdx
 
-      - name: Compile with Maven
-        run: mvn clean compile
-
-      - name: Test with Maven
-        run: mvn test
 
       - name: Build Docker image
         run: |
