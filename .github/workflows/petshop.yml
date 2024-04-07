@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -25,11 +25,11 @@ jobs:
           distribution: 'maven'
           java-version: '3.8.4'
 
-      - name: Set up SonarQube Scanner
+      - name: Install SonarQube Scanner
         run: |
           curl -o sonar-scanner.zip -L https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
           unzip sonar-scanner.zip
-          export PATH=$PWD/sonar-scanner/bin:$PATH
+        shell: bash
 
       - name: Clean workspace
         run: rm -rf *
@@ -43,15 +43,11 @@ jobs:
       - name: SonarQube analysis
         env:
           SCANNER_HOME: ${{ github.workspace }}/sonar-scanner
-        run: |
-          $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Petshop \
-            -Dsonar.java.binaries=. \
-            -Dsonar.projectKey=Petshop
+        run: $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Petshop -Dsonar.java.binaries=. -Dsonar.projectKey=Petshop
 
       - name: Wait for SonarQube Quality Gate
         uses: SonarSource/wait-for-quality-gate@v1
         with:
-          sonar-host-url: 'https://sonarqube.example.com'
           token: ${{ secrets.SONAR_TOKEN }}
 
       - name: Build WAR file
@@ -70,7 +66,7 @@ jobs:
         run: |
           docker build -t petshop .
           docker tag petshop limkel/petshop:3.0
-          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
           docker push limkel/petshop:3.0
 
       - name: Run TRIVY
@@ -84,5 +80,3 @@ jobs:
           repo: ${{ github.repository }}
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: main
-
-      
