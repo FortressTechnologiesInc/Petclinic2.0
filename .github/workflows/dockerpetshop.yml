@@ -46,9 +46,6 @@ jobs:
           docker build -t limkel/petshop:3.0 -f Dockerfile .
           
 
-      - name: Run Trivy
+       - name: Run Trivy
         run: |
-          docker run --rm \
-            -v ${{ runner.workspace }}:/src \
-            aquasec/trivy:latest \
-            image limkel/petshop:3.0 > trivy.txt
+          trivy filesystem --exit-code 1 --no-progress /
