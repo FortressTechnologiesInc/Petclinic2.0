@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: petclinic
-        image: sevenajay/petclinic7:latest
+        image: limkel/petshop:3.0
         ports:
         - containerPort: 8080
         imagePullPolicy: Always
@@ -24,7 +24,7 @@ kind: Service
 metadata:
   name: petclinic
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: petclinic
   ports:
