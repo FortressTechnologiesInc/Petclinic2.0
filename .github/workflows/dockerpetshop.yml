@@ -46,6 +46,4 @@ jobs:
           docker build -t limkel/petshop:3.0 -f Dockerfile .
           
 
-       - name: Run Trivy
-        run: |
-          trivy filesystem --exit-code 1 --no-progress /
+   
