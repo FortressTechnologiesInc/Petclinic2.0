@@ -35,7 +35,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t petclinic1 .
+          docker build -t petclinic1 . -f /Petclinic2.0/Dockerfile
           docker tag petshop  limkel/petshop:3.0
           docker push limkel/petshop:3.0
       - name: Run Trivy
