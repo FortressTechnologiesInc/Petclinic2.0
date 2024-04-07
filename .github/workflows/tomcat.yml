@@ -1,0 +1,68 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Maven
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          server-id: github
+          server-username: ${{ github.actor }}
+          server-password: ${{ secrets.GITHUB_TOKEN }}
+          overwrite-settings: true
+
+      - name: Clean workspace
+        run: git clean -fdx
+
+      - name: Compile with Maven
+        run: mvn compile
+
+      - name: Test with Maven
+        run: mvn test
+
+      - name: Install with Maven
+        run: mvn clean install
+
+      - name: Build Docker image
+        run: |
+          docker build -t limkel/petshop:3.0 -f Dockerfile .
+
+   
+      - name: Install and configure Tomcat
+        run: |
+          # Install Tomcat
+          wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.65/bin/apache-tomcat-9.0.65.tar.gz
+          tar -xf apache-tomcat-9.0.65.tar.gz
+          export CATALINA_HOME=$PWD/apache-tomcat-9.0.65
+          
+          # Configure Tomcat (example: deploy the application)
+          cp /path/to/petclinic.war $CATALINA_HOME/webapps/
+          $CATALINA_HOME/bin/startup.sh
+          
+          # Wait for Tomcat to start
+          sleep 10
+          
+          # Verify Tomcat is running
+          curl http://localhost:8080/
+
+      - name: Run Docker container
+        run: |
+          docker run --rm -d -p 8080:8080 limkel/petshop:3.0
