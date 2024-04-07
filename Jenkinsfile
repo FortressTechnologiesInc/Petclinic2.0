@@ -5,7 +5,7 @@ pipeline{
         maven 'maven3'
     }
     environment {
-        SCANNER_HOME=tool 'sonar-scanner'
+        SCANNER_HOME=tool 'scanner'
     }
     stages {
         stage('clean workspace'){
@@ -30,17 +30,17 @@ pipeline{
         }
         stage("Sonarqube Analysis "){
             steps{
-                withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Petclinic \
+                withSonarQubeEnv('sonar') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Petshop:3.0 \
                     -Dsonar.java.binaries=. \
-                    -Dsonar.projectKey=Petclinic '''
+                    -Dsonar.projectKey=Petshop:3.0 '''
                 }
             }
         }
         stage("quality gate"){
            steps {
                  script {
-                     waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token' 
+                     waitForQualityGate abortPipeline: false, credentialsId: 'Sonar' 
                     }
                 } 
         } 
@@ -51,7 +51,7 @@ pipeline{
         }  
         stage("OWASP Dependency Check"){
             steps{
-                dependencyCheck additionalArguments: '--scan ./ --format HTML ', odcInstallation: 'DP-Check'
+                dependencyCheck additionalArguments: '--scan ./ --format HTML ', odcInstallation: 'DP'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.html'
             }
         }
@@ -59,16 +59,16 @@ pipeline{
             steps{
                 script{
                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
-                       sh "docker build -t petclinic1 ."
-                       sh "docker tag petclinic1 sevenajay/petclinic1:latest "
-                       sh "docker push sevenajay/petclinic1:latest "
+                       sh "docker build -t limkel/petshop:3.0 ."
+                       sh "docker tag petshop  limkel/petshop:3.0 "
+                       sh "docker push limkel/petshop:3.0 "
                     }
                 }
             }
         }
         stage("TRIVY"){
             steps{
-                sh "trivy image sevenajay/petclinic1:latest > trivy.txt" 
+                sh "trivy image limkel/petshop:3.0 > trivy.txt" 
             }
         }
         stage('Clean up containers') {   //if container runs it will stop and remove this block
@@ -111,12 +111,12 @@ pipeline{
     }
         stage('Deploy to conatiner'){
             steps{
-                sh 'docker run -d --name pet1 -p 8082:8080 sevenajay/petclinic1:latest'
+                sh 'docker run -d --name pet1 -p 8082:8080 limkel/petshop:3.0'
             }
         }
         stage("Deploy To Tomcat"){
             steps{
-                sh "sudo cp  /var/lib/jenkins/workspace/petclinic/target/petclinic.war /opt/apache-tomcat-9.0.65/webapps/ "
+                sh "sudo cp  /var/lib/jenkins/workspace/petshop/target/petshop.war /opt/apache-tomcat-9.0.65/webapps/ "
             }
         }
         stage('Deploy to kubernets'){
