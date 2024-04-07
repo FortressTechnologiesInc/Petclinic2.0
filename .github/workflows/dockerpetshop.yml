@@ -32,6 +32,15 @@ jobs:
       - name: Clean workspace
         run: git clean -fdx
 
+      - name: Compile with Maven
+        run: mvn compile
+
+      - name: Test with Maven
+        run: mvn test
+
+      - name: Install with Maven
+        run: mvn clean install
+
       - name: Build Docker image
         run: |
           docker build -t limkel/petshop:3.0 -f Petclinic2.0/Dockerfile .
