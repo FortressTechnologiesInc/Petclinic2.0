@@ -1,4 +1,4 @@
-name: Build, Analyze, Scan, and Deploy
+name: CI/CD Pipeline
 
 on:
   push:
@@ -7,81 +7,41 @@ on:
 
 jobs:
   build:
-    name: Build
-    runs-on: ubuntu:latest
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
-          java-version: 17
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: Cache SonarQube packages
-        uses: actions/cache@v1
+      - name: Set up Maven
+        uses: actions/setup-java@v2
         with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+          distribution: 'maven'
+          java-version: '3.8.5'
 
-      - name: Cache Maven packages
-        uses: actions/cache@v1
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+      - name: Clean workspace
+        run: git clean -fdx
 
-      - name: Build and analyze with SonarQube
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=limkel-petshop:3.0
+      - name: Compile with Maven
+        run: mvn clean compile
 
-  dependency-check:
-    name: Dependency Check
-    runs-on: self-hosted
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Run Dependency Check
-        uses: docker://owasp/dependency-check:latest
-        with:
-          args: --scan ./ --format HTML
-
-  docker-build-push:
-    name: Docker Build and Push
-    runs-on: self-hosted
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Test with Maven
+        run: mvn test
 
       - name: Build Docker image
-        run: docker build -t limkel/petshop:3.0 .
-
-      - name: Tag Docker image
-        run: docker tag petshop limkel/petshop:3.0
-
-      - name: Push Docker image
-        run: docker push limkel/petshop:3.0
-
-  trivy-scan:
-    name: Trivy Scan
-    runs-on: self-hosted
-    steps:
-      - name: Install Trivy
         run: |
-          wget https://github.com/aquasecurity/trivy/releases/download/v0.21.0/trivy_0.21.0_Linux-64bit.deb
-          sudo dpkg -i trivy_0.21.0_Linux-64bit.deb
-
-      - name: Run Trivy scan
-        run: trivy image limkel/petshop:3.0 > trivy.txt
+          docker build -t petclinic1 .
+          docker tag petshop  limkel/petshop:3.0
+          docker push limkel/petshop:3.0
+      - name: Run Trivy
+        run: |
+          docker run --rm \
+            -v ${{ runner.workspace }}:/src \
+            aquasec/trivy:latest \
+            image limkel/petshop:3.0 > trivy.txt
