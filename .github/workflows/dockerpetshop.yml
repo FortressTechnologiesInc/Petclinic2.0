@@ -44,6 +44,6 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t limkel/petshop:3.0 -f Dockerfile .
-          
-
+          docker tag petshop -t limkel/petshop:3.0 
+          docker push  limkel/petshop:3.0 
    
