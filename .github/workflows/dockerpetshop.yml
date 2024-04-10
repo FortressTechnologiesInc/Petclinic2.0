@@ -48,3 +48,4 @@ jobs:
       - name: Run Docker container
         run: |
           docker run --rm -d -p 8080:8080 limkel/petshop:3.0
+          docker push limkel/petshop:3.0
