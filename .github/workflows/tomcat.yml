@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
@@ -44,25 +44,6 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t limkel/petshop:3.0 -f Dockerfile .
-
-   
-      - name: Install and configure Tomcat
-        run: |
-          # Install Tomcat
-          wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.65/bin/apache-tomcat-9.0.65.tar.gz
-          tar -xf apache-tomcat-9.0.65.tar.gz
-          export CATALINA_HOME=$PWD/apache-tomcat-9.0.65
-          
-          # Configure Tomcat (example: deploy the application)
-          cp /path/to/petclinic.war $CATALINA_HOME/webapps/
-          $CATALINA_HOME/bin/startup.sh
-          
-          # Wait for Tomcat to start
-          sleep 10
-          
-          # Verify Tomcat is running
-          curl http://localhost:8080/
-
       - name: Run Docker container
         run: |
           docker run --rm -d -p 8080:8080 limkel/petshop:3.0
