@@ -29,9 +29,9 @@ jobs:
         run: git clean -fdx
 
       - name: Build Docker image
-        run: docker build -t iscanprint/tomcat:2.0 -f Dockerfile1 .
+        run: docker build -t iscanprint/tomcat:2.2 -f Dockerfile1 .
 
       - name: Push Docker image to Docker Hub
-        run: docker push iscanprint/tomcat:2.0
+        run: docker push iscanprint/tomcat:2.2
 
      
