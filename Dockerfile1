@@ -1,0 +1,30 @@
+# Use a base image with Java and other necessary utilities
+FROM ubuntu:20.04
+
+# Install necessary packages
+RUN apt-get update && \
+    apt-get install -y wget tar openjdk-11-jdk && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set environment variables
+ENV CATALINA_HOME /opt/apache-tomcat-9.0.65
+
+# Download and extract Apache Tomcat
+RUN wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.65/bin/apache-tomcat-9.0.65.tar.gz -P /tmp && \
+    tar xfz /tmp/apache-tomcat-9.0.65.tar.gz -C /opt && \
+    rm /tmp/apache-tomcat-9.0.65.tar.gz && \
+    ln -s $CATALINA_HOME/bin/startup.sh /usr/bin/startTomcat && \
+    ln -s $CATALINA_HOME/bin/shutdown.sh /usr/bin/stopTomcat
+
+# Add manager and host-manager changes
+RUN sed -i 's/<Valve className="org.apache.catalina.valves.RemoteAddrValve" allow="127\\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" \/>/<!-- <Valve className="org.apache.catalina.valves.RemoteAddrValve" allow="127\\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" \/> -->/' $CATALINA_HOME/webapps/manager/META-INF/context.xml && \
+    sed -i 's/<Valve className="org.apache.catalina.valves.RemoteAddrValve" allow="127\\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" \/>/<!-- <Valve className="org.apache.catalina.valves.RemoteAddrValve" allow="127\\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" \/> -->/' $CATALINA_HOME/webapps/host-manager/META-INF/context.xml
+
+# Add admin user to tomcat-users.xml
+RUN echo '<user username="admin" password="admin1234" roles="admin-gui, manager-gui, manager-script" />' >> $CATALINA_HOME/conf/tomcat-users.xml
+
+# Expose ports
+EXPOSE 8080
+
+# Start Tomcat
+CMD ["catalina.sh", "run"]
