@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 
 # Install necessary packages
 RUN apt-get update && \
-    apt-get install -y wget tar openjdk-11-jdk && \
+    apt-get install -y wget tar openjdk-17-jdk && \
     rm -rf /var/lib/apt/lists/*
 
 # Set environment variables
