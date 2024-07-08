@@ -34,5 +34,4 @@ jobs:
       - name: Push Docker image to Docker Hub
         run: docker push iscanprint/tomcat:2.0
 
-      - name: Run Docker container
-        run: docker run --rm -d -p 8080:8080 iscanprint/tomcat:2.0
+     
