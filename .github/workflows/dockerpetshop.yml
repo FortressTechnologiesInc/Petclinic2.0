@@ -46,9 +46,9 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t limkel/petshop:3.0 -f Dockerfile .
+          docker build -t iscanprint/tomcat:2.0 -f Dockerfile1 .
 
       - name: Run Docker container
         run: |
-          docker run --rm -d -p 8080:8080 limkel/petshop:3.0
-          docker push limkel/petshop:3.0
+          docker run --rm -d -p 8080:8080 iscanprint/tomcat:2.0
+          docker push iscanprint/tomcat:2.0
