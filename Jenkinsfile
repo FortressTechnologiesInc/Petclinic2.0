@@ -116,7 +116,7 @@ pipeline {
         stage('Deploy to Tomcat') {
             steps {
                 deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://192.168.4.17:8711/')], contextPath: 'petshop', war: '**/*.war'
-                sh "sudo cp /root/appnode/workspace/petshop/target/petshop.war /opt/apache-tomcat-10.1.28/webapps/"
+                 sh "sudo cp /root/appnode/workspace/petshop/target/petclinic.war /opt/apache-tomcat-10.1.28/webapps/"
             }
         }
         stage('1.1 Clean Workspace') {
