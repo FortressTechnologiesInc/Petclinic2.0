@@ -8,7 +8,7 @@ pipeline {
         SCANNER_HOME = tool 'scanner'
     }
     stages {
-        stage('Clean Workspace') {
+        stage('1.0 Clean Workspace') {
             steps {
                 cleanWs()
             }
@@ -119,7 +119,7 @@ pipeline {
                 sh "sudo cp /root/appnode/workspace/petshop/target/petshop.war /opt/apache-tomcat-10.1.28/webapps/"
             }
         }
-        stage('Clean Workspace') {
+        stage('1.1 Clean Workspace') {
             steps {
                 cleanWs()
             }
