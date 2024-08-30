@@ -1,5 +1,5 @@
 # Use Tomcat Alpine base image with OpenJDK 17
-FROM tomcat:9.0.65-jdk17-openjdk-alpine
+FROM tomcat:latest
 
 # Set environment variables
 ENV CATALINA_HOME /usr/local/tomcat
