@@ -1,9 +1,9 @@
-name: Docker Build and Deploy
+name: Maven Build and Deploy
 
 on:
   push:
     branches:
-      - main
+      - start
 
 jobs:
   build:
@@ -23,30 +23,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get upgrade -y
-
       - name: Install Maven
         run: |
           sudo apt-get install -y maven
-
       - name: Build with Maven
         run: mvn clean package
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build Docker image
-        run: |
-          docker build -t iscanprint/petclinic:2.0 .
-
-      - name: Push Docker image
-        run: |
-          docker push  iscanprint/petclinic:2.0
-
-      - name: Logout from Docker Hub
-        run: docker logout
