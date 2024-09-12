@@ -1,8 +1,12 @@
-# Use a base image that includes Maven or install Maven manually
-FROM maven:3.8.6-openjdk-17 as builder
+# Use a base image with OpenJDK 17
+FROM openjdk:17-jdk as builder
 
 # Set the working directory
 WORKDIR /app
+
+# Install Maven
+RUN apt-get update && \
+    apt-get install -y maven
 
 # Copy the Maven project files into the container
 COPY . .
@@ -11,7 +15,7 @@ COPY . .
 RUN mvn clean package -DskipTests=true
 
 # Use Tomcat base image
-FROM tomcat:9-jdk17
+FROM tomcat:9.0.73-jdk17
 
 # Remove default webapps and logs
 RUN rm -rf /usr/local/tomcat/webapps/* && \
