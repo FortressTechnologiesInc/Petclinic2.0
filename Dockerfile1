@@ -1,12 +1,8 @@
-# Use a base image with OpenJDK 17
-FROM openjdk:17-jdk as builder
+# Use a Maven base image with OpenJDK 17
+FROM maven:3.9.0-openjdk-17 as builder
 
 # Set the working directory
 WORKDIR /app
-
-# Install Maven
-RUN apt-get update && \
-    apt-get install -y maven
 
 # Copy the Maven project files into the container
 COPY . .
